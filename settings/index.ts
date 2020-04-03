@@ -7,3 +7,5 @@ export const SIGINT = 'SIGINT';
 export const TEST = 'test';
 export const PRODUCTION = 'production';
 export const DEVELOPMENT = 'development';
+
+export const API_VERSION = '/api/v1';

@@ -5,12 +5,13 @@
     "main": "index.js",
     "scripts": {
         "build": "tsc",
-        "start": "./node_modules/.bin/pm2 start www/index.ts --name theft-processor",
-        "start:dev": "yarn start --watch",
-        "logs": "./node_modules/.bin/pm2 logs",
+        "start": "bash bin/start.sh",
+        "stop": "bash bin/stop.sh",
+        "start:dev": "bash bin/start-watch.sh",
+        "logs": "bash bin/inspect-logs.sh",
         "lint": "tsdx lint .",
         "lint:dev": "tsdx lint . --fix",
-        "postinstall": "$(yarn bin)/pm2 install typescript"
+        "postinstall": "bash bin/post-install.sh"
     },
     "keywords": [],
     "author": "",
@@ -35,6 +36,7 @@
         "pm2": "^4.2.3",
         "redis": "^3.0.2",
         "reflect-metadata": "^0.1.13",
+        "routing-controllers": "^0.8.1-alpha.2",
         "tsdx": "^0.13.0",
         "typedi": "^0.8.0"
     },
