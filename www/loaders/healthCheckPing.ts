@@ -13,7 +13,7 @@ const APP_URL: string = NODE_ENV.match(DEVELOPMENT)
     : PROD_SERVER;
 
 const HTTP_PROTOCOL = NODE_ENV.match(DEVELOPMENT) ? http : https;
-const PING_INTERVAL: number = 1000 * 60;
+const PING_INTERVAL: number = 1000 * 60 * 60;
 
 const handlePing = (): void => {
     if (!NODE_ENV.match(PRODUCTION) && !NODE_ENV.match(DEVELOPMENT)) {
