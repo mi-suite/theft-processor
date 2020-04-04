@@ -27,6 +27,6 @@ export const REDIS_URL = process.env.REDIS_URL || '';
 // kafka
 export const KAFKA_CLIENT_ID = process.env.KAFKA_CLIENT_ID || '';
 export const KAFKA_BROKERS = [
-    process.env.KAFKA_BROKER_1 || '',
+    // process.env.KAFKA_BROKER_1 || '',
     process.env.KAFKA_BROKER_2 || '',
 ];

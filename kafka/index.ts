@@ -3,26 +3,21 @@ import {
 } from 'kafkajs';
 import { Service } from 'typedi';
 
-import { KAFKA_CLIENT_ID, KAFKA_BROKERS } from '../../env/index';
-import { UNCAUGHT_EXCEPTION, UNHANDLED_REJECTION } from '../../settings';
+import { KAFKA_CLIENT_ID, KAFKA_BROKERS } from '../env/index';
+import { IPubSuB } from '../pubsub/pubsub.interface';
+import { UNCAUGHT_EXCEPTION, UNHANDLED_REJECTION } from '../settings';
 
-interface IPublishOptions {
-    topic: string;
-    message: any;
-}
-
-interface ISubscribeOptions {
-    topic: string;
-    fromBeginning?: boolean;
-}
+import { IPublishOptions, ISubscribeOptions } from './kafka.interface';
 
 @Service()
-export class KafkaClient {
+export class KafkaClient implements IPubSuB<IPublishOptions, ISubscribeOptions> {
     public kafka: Kafka;
     public producer: Producer;
     public consumer: Consumer;
 
     public constructor () {
+        console.log(KAFKA_BROKERS, 'KAFKA_BROKERS');
+
         this.kafka = new Kafka({
             clientId: KAFKA_CLIENT_ID,
             brokers: KAFKA_BROKERS,
@@ -35,7 +30,7 @@ export class KafkaClient {
         this.bindErrorTraps();
     }
 
-    private connectProducer = async (): Promise<void> => {
+    public connectProducer = async (): Promise<void> => {
         const CONNECTION_EVENT = 'producer.connect';
 
         await this.producer.connect();
@@ -45,7 +40,7 @@ export class KafkaClient {
         });
     };
 
-    private disconnectProducer = async (): Promise<void> => {
+    public disconnectProducer = async (): Promise<void> => {
         const DISCONNECTION_EVENT = 'producer.disconnect';
 
         await this.producer.disconnect();
@@ -55,7 +50,7 @@ export class KafkaClient {
         });
     };
 
-    private connectConsumer = async (): Promise<void> => {
+    public connectConsumer = async (): Promise<void> => {
         const CONNECTION_EVENT = 'consumer.connect';
 
         await this.consumer.connect();
@@ -65,7 +60,7 @@ export class KafkaClient {
         });
     };
 
-    private disconnectConsumer = async (): Promise<void> => {
+    public disconnectConsumer = async (): Promise<void> => {
         const DISCONNECTION_EVENT = 'consumer.disconnect';
 
         await this.consumer.disconnect();
@@ -79,49 +74,41 @@ export class KafkaClient {
         value: JSON.stringify(message),
     });
 
-    private sendMessage = async (config: IPublishOptions): Promise<any> => {
-        const { topic, message } = config;
-
+    public publish = async (options: IPublishOptions): Promise<any> => {
         try {
+            const { topic, message } = options;
+
+            await this.connectProducer();
+
             await this.producer.send({
                 topic: topic,
                 compression: CompressionTypes.GZIP,
                 messages: Array(this.createMessage(message)),
             });
         } catch (error) {
-            console.error(`KafkaClient:::sendMessage: ${error.message}`, error);
-        }
-    };
-
-    public publish = async (options: IPublishOptions): Promise<any> => {
-        try {
-            await this.connectProducer();
-
-            await this.sendMessage(options);
-        } catch (error) {
             console.error(`KafkaClient:::publish: ${error.message}`, error);
         }
     };
 
     public subscribe = async (options: ISubscribeOptions): Promise<any> => {
+        const { callback } = options;
+
         try {
             await this.connectConsumer();
 
+            Reflect.deleteProperty(options, 'callback');
+
             await this.consumer.subscribe(options);
 
-            const data = await this.consumer.run({
-                // eachBatch: async ({ batch }) => {
-                //   console.log(batch)
-                // },
-                eachMessage: async ({ topic, partition, message }) => {
-                    const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`;
-                    console.log(`- ${prefix} ${message.key}#${message.value}`);
+            await this.consumer.run({
+                eachMessage: async ({ message }) => {
+                    if (callback) {
+                        callback(message);
+                    }
                 },
             });
-
-            return data;
         } catch (error) {
-            console.error(`KafkaClient:::publish: ${error.message}`);
+            console.error(`KafkaClient:::subscribe: ${error.message}`);
         }
     };
 
