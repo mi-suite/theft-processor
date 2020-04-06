@@ -3,7 +3,7 @@ import {
 } from 'kafkajs';
 import { Service } from 'typedi';
 
-import { KAFKA_CLIENT_ID, KAFKA_BROKERS } from '../env/index';
+import { KAFKA_CLIENT_ID, KAFKA_BROKERS } from '../env';
 import { IPubSuB } from '../pubsub/pubsub.interface';
 import { UNCAUGHT_EXCEPTION, UNHANDLED_REJECTION } from '../settings';
 
@@ -16,8 +16,6 @@ export class KafkaClient implements IPubSuB<IPublishOptions, ISubscribeOptions> 
     public consumer: Consumer;
 
     public constructor () {
-        console.log(KAFKA_BROKERS, 'KAFKA_BROKERS');
-
         this.kafka = new Kafka({
             clientId: KAFKA_CLIENT_ID,
             brokers: KAFKA_BROKERS,
@@ -74,7 +72,7 @@ export class KafkaClient implements IPubSuB<IPublishOptions, ISubscribeOptions> 
         value: JSON.stringify(message),
     });
 
-    public publish = async (options: IPublishOptions): Promise<any> => {
+    public publish = async (options: IPublishOptions): Promise<void> => {
         try {
             const { topic, message } = options;
 
@@ -90,7 +88,7 @@ export class KafkaClient implements IPubSuB<IPublishOptions, ISubscribeOptions> 
         }
     };
 
-    public subscribe = async (options: ISubscribeOptions): Promise<any> => {
+    public subscribe = async (options: ISubscribeOptions): Promise<void> => {
         const { callback } = options;
 
         try {
