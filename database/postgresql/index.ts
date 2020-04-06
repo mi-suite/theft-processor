@@ -47,7 +47,7 @@ export class PG {
 
             return executedQuery;
         } catch (error) {
-            console.error(`PG:::query: Error eexcuting query::::::::${error}`);
+            console.error(`PG:::query: Error executing query::::${error}`);
 
             return error;
         }

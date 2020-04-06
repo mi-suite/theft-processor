@@ -1,8 +1,8 @@
 import { Container } from 'typedi';
 
-import { TheftService } from '../../services/TheftService';
+import { ProcessTheftDataFromQueue } from '../../services/ProcessTheftDataFromQueue';
 
-const theftService = Container.get(TheftService);
+const theftDataProcessor = Container.get(ProcessTheftDataFromQueue);
 (async (): Promise<void> => {
-    await theftService.getTheftData();
+    await theftDataProcessor.getTheftDataFromQueue();
 })();

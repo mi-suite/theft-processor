@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 
-import { KafkaClient } from '../kafka/index';
+import { KafkaClient } from '../kafka';
 import { IPublishOptions, ISubscribeOptions } from '../kafka/kafka.interface';
 
 import { IPubSuB } from './pubsub.interface';
