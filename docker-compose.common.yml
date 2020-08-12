@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+    theft_processor_redis_cache:
+        image: redis:alpine
+        networks:
+            - app-network
+
+    theft_processor_zookeeper_container:
+        image: wurstmeister/zookeeper:latest
+
+    theft_processor_kafka_container:
+        image: wurstmeister/kafka:2.11-1.1.1
+        links:
+            - theft_processor_zookeeper_container
+
+    theft_processor_container:
+        image: theft_processor_image
+        env_file: .env
+        links:
+            - theft_processor_pg_container
+            - theft_processor_redis_cache
+        depends_on:
+            - theft_processor_pg_container
+            - theft_processor_redis_cache
+            - theft_processor_zookeeper_container
+            - theft_processor_kafka_container
+        networks:
+            - app-network
+
+    theft_processor_pg_container:
+        image: postgres
+        restart: always
+        networks:
+            - app-network
+        volumes:
+            - ./theft_processor_pg_container:/var/lib/postgresql/data
+
+networks:
+    app-network:
+        driver: bridge
+
+volumes:
+    theft_processor_pg_container:

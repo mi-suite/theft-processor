@@ -3,7 +3,8 @@
         ".",
     ],
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "dist"
     ],
     "compilerOptions": {
         "target": "es6",
@@ -29,13 +30,6 @@
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "moduleResolution": "node",
-        "baseUrl": "./",
-        "paths": {
-            "*": [
-                "src/*",
-                "node_modules/*"
-            ]
-        },
         "esModuleInterop": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
